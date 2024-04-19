@@ -13,8 +13,11 @@ public class SerCouponService {
 
     @Transactional
     public void getCoupon(Long id) {
-        Coupon coupon = couponRepository.findById(id)
-                .orElseThrow(RuntimeException::new);
+        Coupon coupon = couponRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        if(coupon.getQuantity() <= 0) {
+            throw new RuntimeException();
+        }
 
         coupon.getCoupon();
     }
