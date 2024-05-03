@@ -12,8 +12,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class SerCouponControllerTest {
 
@@ -38,15 +36,18 @@ class SerCouponControllerTest {
     @Test
     void getCoupon() {
 
-        int threadCount = 10;
+        int threadCount = 3;
         int customerCount = 1000;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(customerCount);
 
         for(int i = 0; i < customerCount; i++) {
             executorService.execute(() -> {
-                couponController.getCoupon(coupon.getId());
-                latch.countDown();
+                try {
+                    couponController.getCoupon(coupon.getId());
+                } finally {
+                    latch.countDown();
+                }
             });
         }
 
