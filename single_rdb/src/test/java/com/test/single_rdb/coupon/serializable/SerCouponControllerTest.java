@@ -58,8 +58,6 @@ class SerCouponControllerTest {
         }
 
         Coupon c = couponRepository.findById(coupon.getId()).get();
-        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        System.out.println("c.getQuantity() = " + c.getQuantity());
         
         Assertions.assertThat(c.getQuantity()).isEqualTo(coupon.getQuantity() - customerCount);
     }
