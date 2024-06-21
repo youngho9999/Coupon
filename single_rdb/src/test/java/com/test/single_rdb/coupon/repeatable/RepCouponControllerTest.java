@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @SpringBootTest
@@ -42,10 +43,16 @@ class RepCouponControllerTest {
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(customerCount);
 
+        AtomicInteger sCount = new AtomicInteger();
+        AtomicInteger fCount = new AtomicInteger();
+
         for(int i = 0; i < customerCount; i++) {
             executorService.execute(() -> {
                 try {
                     couponController.getCoupon(coupon.getId());
+                    sCount.getAndIncrement();
+                } catch (Exception e) {
+                    fCount.getAndIncrement();
                 } finally {
                     latch.countDown();
                 }
@@ -59,8 +66,11 @@ class RepCouponControllerTest {
         }
 
         Coupon c = couponRepository.findById(coupon.getId()).get();
-
-        Assertions.assertThat(c.getQuantity()).isEqualTo(coupon.getQuantity() - customerCount);
+        System.out.println("*************************************************");
+        System.out.println("remainCoupon = " + c.getQuantity());
+        System.out.println("sCount = " + sCount);
+        System.out.println("fCount = " + fCount);
+        Assertions.assertThat(c.getQuantity()).isEqualTo(coupon.getQuantity() - sCount.get());
     }
 
 }
